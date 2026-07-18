@@ -76,7 +76,7 @@ const taskGrid: Record<TaskKey, string> = {
   image: 'columns-1 gap-5 [column-fill:_balance] sm:columns-2 xl:columns-3',
   sbm: 'grid gap-5 md:grid-cols-2 xl:grid-cols-3',
   pdf: 'grid gap-5 md:grid-cols-2 xl:grid-cols-3',
-  profile: 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  profile: 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
 }
 
 // Shared premium surface: hairline border, soft radius, smooth lift on hover.
@@ -353,15 +353,27 @@ function PdfArchiveCard({ post, href }: { post: SitePost; href: string }) {
 function ProfileArchiveCard({ post, href }: { post: SitePost; href: string }) {
   const avatar = getImages(post)[0]
   const role = getField(post, ['role', 'designation', 'company', 'location'])
+  const location = getField(post, ['location', 'city', 'address'])
+  const category = getCategory(post, 'Professional')
   return (
-    <Link href={href} className={`${cardBase} flex flex-col items-center p-7 text-center`}>
-      <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-[var(--tk-line)] bg-[var(--tk-raised)]">
-        {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : <UserRound className="h-10 w-10 text-[var(--tk-muted)]" />}
+    <Link href={href} className={`${cardBase} relative flex flex-col overflow-hidden`}>
+      <div className="h-24 bg-[linear-gradient(135deg,#280710,#981136)] opacity-95" />
+      <div className="relative flex flex-1 flex-col px-6 pb-6">
+        <div className="-mt-12 flex items-end justify-between gap-3">
+          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-[var(--tk-raised)] shadow-lg">
+            {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : <UserRound className="h-10 w-10 text-[var(--tk-muted)]" />}
+          </div>
+          <span className="mb-1 rounded-full bg-[var(--tk-accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--tk-accent)]">Verified profile</span>
+        </div>
+        <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--tk-accent)]">{category}</p>
+        <h2 className="editable-display mt-2 text-xl font-semibold tracking-[-0.02em]">{post.title}</h2>
+        {role ? <p className="mt-1.5 text-sm font-medium text-[var(--tk-muted)]">{role}</p> : null}
+        <p className="mt-4 line-clamp-3 flex-1 text-sm leading-6 text-[var(--tk-muted)]">{getSummary(post) || 'View this profile to learn more about their experience, work, and professional focus.'}</p>
+        <div className="mt-5 flex items-center justify-between border-t border-[var(--tk-line)] pt-4 text-xs font-medium text-[var(--tk-muted)]">
+          <span className="inline-flex min-w-0 items-center gap-1.5 truncate">{location ? <><MapPin className="h-3.5 w-3.5 shrink-0 text-[var(--tk-accent)]" /> {location}</> : 'View professional profile'}</span>
+          <ArrowUpRight className="h-4 w-4 shrink-0 text-[var(--tk-accent)] transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </div>
       </div>
-      <h2 className="editable-display mt-5 text-lg font-semibold tracking-[-0.02em]">{post.title}</h2>
-      {role ? <p className="mt-1.5 text-xs font-medium uppercase tracking-[0.16em] text-[var(--tk-accent)]">{role}</p> : null}
-      <RatingLine post={post} center />
-      <p className="mt-3 line-clamp-2 text-sm leading-6 text-[var(--tk-muted)]">{getSummary(post)}</p>
     </Link>
   )
 }
