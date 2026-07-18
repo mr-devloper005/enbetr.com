@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ArrowUpRight, Bookmark, Building2, Camera, CheckCircle2, Download, ExternalLink, FileText, Globe2, Mail, MapPin, Phone, Star, Tag, UserRound } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, BadgeCheck, Bookmark, Building2, Camera, CheckCircle2, Download, ExternalLink, FileText, Globe2, Mail, MapPin, Phone, Star, Tag, UserRound } from 'lucide-react'
 import { buildPostMetadata, buildTaskMetadata } from '@/lib/seo'
 import { fetchArticleComments, fetchTaskPostBySlug, fetchTaskPosts } from '@/lib/task-data'
 import { getTaskConfig, SITE_CONFIG, type TaskKey } from '@/lib/site-config'
@@ -282,7 +282,6 @@ function ClassifiedDetail({ post, related }: { post: SitePost; related: SitePost
         <article className="min-w-0">
           <ImageStrip images={images} label="Offer images" large />
           <BodyContent post={post} />
-          <ContactAction website={website} phone={phone} email={email} />
         </article>
       </section>
       <RelatedStrip task="classified" related={related} />
@@ -387,29 +386,55 @@ function PdfDetail({ post, related }: { post: SitePost; related: SitePost[] }) {
 function ProfileDetail({ post, related }: { post: SitePost; related: SitePost[] }) {
   const images = getImages(post)
   const role = getField(post, ['role', 'designation', 'company', 'location'])
+  const location = getField(post, ['location', 'city', 'address'])
+  const company = getField(post, ['company', 'organization', 'business'])
   const website = getField(post, ['website', 'url'])
   const email = getField(post, ['email'])
   return (
     <>
-      <section className="mx-auto max-w-[var(--editable-container)] px-6 py-14 sm:py-20 lg:px-8">
-        <BackLink task="profile" />
-        <div className="mt-8 grid gap-10 lg:grid-cols-[360px_minmax(0,1fr)]">
-          <aside className="lg:sticky lg:top-24 lg:self-start">
-            <div className="rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)] p-8 text-center shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
-              <div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-[var(--tk-line)] bg-[var(--tk-raised)]">
-                {images[0] ? <img src={images[0]} alt="" className="h-full w-full object-cover" /> : <UserRound className="h-14 w-14 text-[var(--tk-muted)]" />}
+      <section className="relative overflow-hidden bg-[#26070f] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(163,15,56,.55),transparent_34%),linear-gradient(120deg,#22060d,#671024)]" />
+        <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:22px_22px]" />
+        <div className="relative mx-auto max-w-[var(--editable-container)] px-6 py-12 sm:py-16 lg:px-8">
+          <Link href={getTaskConfig('profile')?.route || '/profile'} className="inline-flex items-center gap-2 text-sm font-medium text-white/70 transition hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to profiles</Link>
+          <div className="mt-10 flex flex-col items-center gap-7 text-center md:flex-row md:text-left">
+            <div className="flex h-40 w-40 shrink-0 items-center justify-center overflow-hidden rounded-[2rem] border-4 border-white/80 bg-white/10 shadow-2xl sm:h-48 sm:w-48">
+              {images[0] ? <img src={images[0]} alt="" className="h-full w-full object-cover" /> : <UserRound className="h-16 w-16 text-white/60" />}
+            </div>
+            <div className="min-w-0">
+              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#e2bd64]"><BadgeCheck className="h-4 w-4" /> Professional profile</p>
+              <h1 className="editable-display mt-4 text-balance text-4xl font-semibold tracking-[-0.035em] sm:text-5xl lg:text-6xl">{post.title}</h1>
+              {role ? <p className="mt-3 text-lg text-white/75">{role}</p> : null}
+              <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
+                {location ? <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/80"><MapPin className="h-4 w-4 text-[#e2bd64]" />{location}</span> : null}
+                {company ? <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/80"><Building2 className="h-4 w-4 text-[#e2bd64]" />{company}</span> : null}
               </div>
-              <h1 className="editable-display mt-6 text-2xl font-semibold tracking-[-0.02em]">{post.title}</h1>
-              {role ? <p className="mt-2 text-xs font-medium uppercase tracking-[0.16em] text-[var(--tk-accent)]">{role}</p> : null}
-              <DetailMeta post={post} center />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[var(--editable-container)] px-6 py-12 sm:py-16 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_330px]">
+          <article className="min-w-0 rounded-[1.5rem] border border-[var(--tk-line)] bg-[var(--tk-surface)] p-6 shadow-[0_20px_60px_rgba(71,8,27,.06)] sm:p-9">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--tk-accent)]">About this profile</p>
+            {leadText(post) ? <p className="mt-5 text-xl leading-8 text-[var(--tk-text)]">{leadText(post)}</p> : null}
+            <BodyContent post={post} />
+            <ImageStrip images={images.slice(1)} label="Work and gallery" />
+          </article>
+          <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+            <div className="rounded-[1.5rem] border border-[var(--tk-line)] bg-[var(--tk-surface)] p-6 shadow-[0_20px_60px_rgba(71,8,27,.06)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--tk-accent)]">Connect</p>
+              <h2 className="mt-3 text-xl font-semibold">Start a conversation</h2>
+              <p className="mt-2 text-sm leading-6 text-[var(--tk-muted)]">Use the available contact details to learn more about their work or services.</p>
               <ContactAction website={website} email={email} bare />
             </div>
+            <div className="rounded-[1.5rem] border border-[var(--tk-line)] bg-[var(--tk-accent-soft)] p-6">
+              <BadgeCheck className="h-7 w-7 text-[var(--tk-accent)]" />
+              <h3 className="mt-4 font-semibold">Profile information</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--tk-muted)]">Review the profile details and contact information before making a connection.</p>
+            </div>
           </aside>
-          <article className="min-w-0">
-            <Kicker task="profile">Profile</Kicker>
-            <BodyContent post={post} />
-            <ImageStrip images={images.slice(1)} label="Gallery" />
-          </article>
         </div>
       </section>
       <RelatedStrip task="profile" related={related} />
@@ -567,4 +592,3 @@ function RelatedCard({ task, post, grid = false }: { task: TaskKey; post: SitePo
     </Link>
   )
 }
-
